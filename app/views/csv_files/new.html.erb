@@ -4,7 +4,7 @@
       <h2 class="title is-4">Archivos</h2>
       <%= simple_form_for(@csv_file) do |f| %>
         <%= f.hidden_field :status, value: "Procesando" %>
-        <%= f.hidden_field :errors, value: " " %>
+        <%= f.hidden_field :file_errors, value: " " %>
         <%= simple_fields_for :no_model_fields do |n| %>
           <div class="field">
             <p class="paragraph">Ingresar en los campos a continuacion el numero de columna correspondiente a los datos iniciando por 1.</p>

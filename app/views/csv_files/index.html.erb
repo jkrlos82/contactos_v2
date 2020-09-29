@@ -13,6 +13,7 @@
               <th><abbr title="name">Archivo</abbr></th>
               <th><abbr title="status">Estado</abbr></th>
               <th><abbr title="errors">Errores</abbr></th>
+              <th><abbr title="proccess">Procesar</abbr></th>
             </tr>
           </thead>
           <tbody>
@@ -21,7 +22,7 @@
                 <th><%= csv_file.id %></th>
                 <td><%= csv_file.doc.filename %></td>
                 <td><%= csv_file.status %></td>
-                <td><%= csv_file.errors %></td>
+                <td><%= csv_file.file_errors %></td>
               </tr>
             <% end %>
           </tbody>

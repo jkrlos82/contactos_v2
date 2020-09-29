@@ -13,8 +13,8 @@ class ContactsController < ApplicationController
   end
 
   # GET /contacts/new
-  def new
-    @contact = Contact.new
+  def new 
+    #@contacts = CsvFiles.find(id)
   end
 
   # GET /contacts/1/edit

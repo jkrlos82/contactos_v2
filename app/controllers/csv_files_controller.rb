@@ -28,9 +28,9 @@ class CsvFilesController < ApplicationController
     #render plain: params[:no_model_fields]
     require 'csv'
     @data = params[:csv_file]
-    headers = params[:no_model_fields].permit(params[:no_model_fields].keys).to_h
-    headers = headers.sort_by{|k,v| v}
-    headers = [headers[0][0], headers[1][0], headers[2][0], headers[3][0], headers[4][0], headers[5][0]]
+    @headers = params[:no_model_fields].permit(params[:no_model_fields].keys).to_h
+    @headers = @headers.sort_by{|k,v| v}
+    @headers = [@headers[0][0], @headers[1][0], @headers[2][0], @headers[3][0], @headers[4][0], @headers[5][0]]
     #render plain: headers
     rows = proccess_data @data
     #CSV.foreach(@data[:doc].path, headers: headers, col_sep: ';') do |row|
@@ -39,16 +39,18 @@ class CsvFilesController < ApplicationController
     #  rows << row.to_hash
     #end
     #render plain: rows[0]["name"]
-    render plain: rows
-    #@csv_file = current_user.csv_files.new(csv_file_params)
+    #render plain: rows
+    @csv_file = current_user.csv_files.new(csv_file_params)
     count = 1
     @errors = []
     rows.each do |row|
-      validate = RowsValidatorController.new(row)
-      validate.validates 
-      error = validate.errors 
-      if !error.empty?
-        @errors << error + " Linea " + count.to_s
+      if count != 1
+        validate = RowsValidatorController.new(row)
+        validate.validates 
+        error = validate.errors 
+        if !error.empty?
+          @errors << error + " Linea " + count.to_s
+        end
       end
       count = count + 1
     end
@@ -57,11 +59,28 @@ class CsvFilesController < ApplicationController
     
     
     #proccess_data(@data)
-    #if @csv_file.save
-    #  redirect_to @csv_file, notice: 'Csv file was successfully created.' 
-    #else
-    #  render :new 
-    #end
+    if @errors.empty?
+      if @csv_file.save
+        count = 0
+        rows.each do |row|
+          if count != 0
+            contact = current_user.contacts.new(row)
+            contact.save
+          end
+          count = 1
+        end
+        redirect_to @csv_files_path, notice: 'Csv file was successfully created.' 
+      else
+        render :new 
+      end
+    else
+      @csv_file.status = "Fallido"
+      @csv_file.file_errors = @errors.to_s
+      @csv_file.save
+      redirect_to @csv_file, notice: 'Csv file was created with errors.'
+      #render plain: csv_file_params
+      #render plain: @errors.to_s
+    end
   end
 
   # PATCH/PUT /csv_files/1
@@ -96,13 +115,13 @@ class CsvFilesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def csv_file_params
-      params.require(:csv_file).permit(:status, :errors, :doc)
+      params.require(:csv_file).permit(:status, :file_errors, :doc)
     end
 
     def proccess_data(data)
       require 'csv'
       rows = []
-      CSV.foreach(data[:doc].path, headers: true, col_sep: ';') do |row|
+      CSV.foreach(data[:doc].path, headers: @headers, col_sep: ';') do |row|
         #contact = current_user.contacts.new(row.to_hash)
         #contact.save
         rows << row.to_hash
