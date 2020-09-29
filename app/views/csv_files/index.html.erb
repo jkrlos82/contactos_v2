@@ -1,0 +1,36 @@
+<section class="section">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-4">
+        <p id="notice"><%= notice %></p>
+
+        <h2 class="title is-2">Csv Files</h2>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th><abbr title="id">Id</abbr></th>
+              <th><abbr title="name">Archivo</abbr></th>
+              <th><abbr title="status">Estado</abbr></th>
+              <th><abbr title="errors">Errores</abbr></th>
+              <th><abbr title="proccess">Procesar</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @csv_files.each do |csv_file| %>
+              <tr>
+                <th><%= csv_file.id %></th>
+                <td><%= csv_file.doc.filename %></td>
+                <td><%= csv_file.status %></td>
+                <td><%= csv_file.file_errors %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+        <br>
+
+        <%= link_to 'New Csv File', new_csv_file_path %>
+      </div>
+    </div>
+  </div>
+</section>
